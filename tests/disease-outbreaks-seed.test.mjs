@@ -276,6 +276,8 @@ test('headline-source items without a real publication date are dropped', () => 
 // removing any reportable/recency filter from fetchDiseaseOutbreaks turns this
 // red. Covers headline sources and the WHO archive path.
 test('fetchDiseaseOutbreaks publishes only reportable, in-window items', async (t) => {
+  // Fixed clock: the fixtures and the seeder's cutoff both read Date.now().
+  t.mock.timers.enable({ apis: ['Date'], now: NOW });
   const recent = new Date(Date.now() - 2 * 86_400_000).toUTCString();
   const stale = new Date(Date.now() - (DISEASE_LOOKBACK_DAYS + 5) * 86_400_000).toUTCString();
   const rss = (items) => `<?xml version="1.0"?><rss><channel>${items.map(([title, link, pubDate]) =>
