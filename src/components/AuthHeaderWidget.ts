@@ -1,5 +1,5 @@
 import { subscribeAuthState, type AuthSession } from '@/services/auth-state';
-import { mountUserButton, openSignIn, openSignUp } from '@/services/clerk';
+import { isClerkAuthEnabled, mountUserButton, openSignIn, openSignUp } from '@/services/clerk';
 import { t } from '@/services/i18n';
 import { setTrustedHtml, trustedHtml } from '@/utils/dom-utils';
 
@@ -21,6 +21,15 @@ export class AuthHeaderWidget {
     this.onBillingClick = onBillingClick;
     this.container = document.createElement('div');
     this.container.className = 'auth-header-widget';
+
+    // Self-hosted builds ship without a Clerk publishable key
+    // (isClerkAuthEnabled() === false). Sign In / Create account would render
+    // as dead buttons that open nothing, so the widget stays empty there.
+    // Hosted builds keep the normal signed-out / signed-in flow.
+    if (!isClerkAuthEnabled()) {
+      this.container.classList.add('auth-header-widget-disabled');
+      return;
+    }
 
     this.unsubscribeAuth = subscribeAuthState((state: AuthSession) => {
       if (state.isPending) {
