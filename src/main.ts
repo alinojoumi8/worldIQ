@@ -551,6 +551,7 @@ import { clearChunkReloadGuard, installChunkReloadGuard } from '@/bootstrap/chun
 import { initDebugBearRum } from '@/bootstrap/debugbear-rum';
 import { installStaleBundleCheck } from '@/bootstrap/stale-bundle-check';
 import { installSwUpdateHandler, readServiceWorkerContainer } from '@/bootstrap/sw-update';
+import { seedSelfHostProKey } from '@/bootstrap/self-host-pro';
 
 // Auto-reload on stale chunk 404s after deployment (Vite fires this for modulepreload failures).
 const chunkReloadStorageKey = installChunkReloadGuard(__BUILD_HASH__);
@@ -591,6 +592,9 @@ installWebApiRedirect();
 // is the 'dev' marker.
 installStaleBundleCheck();
 loadDesktopSecrets().catch(() => {});
+
+// Self-host images may bake a local enterprise key; see bootstrap/self-host-pro.ts.
+seedSelfHostProKey();
 
 // Apply stored theme preference before app initialization (safety net for inline script)
 applyStoredTheme();
